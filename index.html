@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Marco Trading Hub v1.1</title>
+<title>Marco Trading Hub v1.2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
@@ -123,7 +123,7 @@ tr:hover td{background:#f8fafc;cursor:pointer}
 
 <div class="header">
   <div class="logo">&#128200; <span>Marco</span> Trading Hub</div>
-  <div class="badge">v1.1</div>
+  <div class="badge">v1.2</div>
   <div class="hdr-right">
     <div class="acct-label">Account:</div>
     <select class="acct-select" id="acctSelect" onchange="onAcctChange()"><option value="">Loading&#8230;</option></select>
@@ -251,7 +251,8 @@ function killCharts(){Object.values(CH).forEach(function(c){try{c.destroy();}cat
 
 // ── BOOT ──────────────────────────────────────────────────────────
 window.onload=function(){
-  var sa=localStorage.getItem('mth_acct');if(sa)acctId=sa;
+  localStorage.removeItem('mth_acct');
+  acctId='';
   renderTabBar();loadData();setInterval(loadData,120000);
 };
 
@@ -306,12 +307,12 @@ async function loadData(){
     }).join('');
     if(prev&&!allAccts.find(function(a){return a.id===prev;}))acctId='';
 
-    // Load trades per account (select only needed columns for speed)
+    // Load trades per account
     var pa=await Promise.all(allAccts.map(function(a){
-      return sb('trades','select=ticket,symbol,direction,lot,entry,sl,tp,pnl,event,ts,duration_min,account_id&order=ts&account_id=eq.'+a.id);
+      return sb('trades','select=*&order=ts&account_id=eq.'+a.id);
     }));
     allAccts.forEach(function(a,i){acctData[a.id]=pa[i]||[];});
-    raw.trades=Object.values(acctData).reduce(function(all,arr){return all.concat(arr);;},[]);
+    raw.trades=Object.values(acctData).reduce(function(all,arr){return all.concat(arr);},[]); 
 
     // Open positions
     raw.positions=[];
