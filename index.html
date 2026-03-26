@@ -384,7 +384,7 @@ async function loadData(){
   var dot=document.getElementById('statusDot'),txt=document.getElementById('statusTxt');
   dot.className='status-dot off'; txt.textContent='Loading...';
   try{
-    var accts=await sb('accounts','select=*&active=eq.true&order=label');
+    var accts=await sb('accounts','select=*&active=eq.true&hub=eq.true&order=label');
     allAccts=accts||[];
     var sel=document.getElementById('acctSelect');
     sel.innerHTML='<option value="">&#128202; All Accounts</option>'+allAccts.map(function(a){
