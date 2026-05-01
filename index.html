@@ -567,7 +567,7 @@ function renderAccountSparklines(){
 function renderPerfCharts(){
   var closed=clPnl(getFilteredSrc());if(!closed.length)return;
   var wk={};
-  closed.forEach(function(t){if(!t.ts)return;var d=new Date(t.ts),mn=new Date(d);mn.setDate(d.getDate()-((d.getDay()+6)%7));var k=mn.toISOString().slice(0,10);wk[k]=(wk[k]||0)+parseFloat(t.pnl||0);});
+  closed.forEach(function(t){if(!t.ts)return;var ds=t.ts.slice(0,10),d=new Date(ds+'T12:00:00Z'),dy=d.getUTCDay(),mn=new Date(d);mn.setUTCDate(d.getUTCDate()-((dy+6)%7));var k=mn.toISOString().slice(0,10);wk[k]=(wk[k]||0)+parseFloat(t.pnl||0);});
   var wkKeys=Object.keys(wk).sort().slice(-16);
   mkBar('wkBar',wkKeys.map(function(k){return k.slice(5);}),wkKeys.map(function(k){return+wk[k].toFixed(2);}));
   var dur={'<1h':0,'1-4h':0,'4-24h':0,'>24h':0};
