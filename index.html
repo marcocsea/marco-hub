@@ -250,7 +250,7 @@ function killCharts(){Object.values(CH).forEach(function(c){try{c.destroy();}cat
 window.onload=function(){
   localStorage.removeItem('mth_acct');
   acctId='';
-  renderTabBar();loadData();setInterval(loadData,120000);
+  renderTabBar();loadData();
 };
 
 function renderTabBar(){
