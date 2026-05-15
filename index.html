@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Marco Trading Hub v1.2</title>
+<title>Marco Trading Hub v1.3</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
@@ -124,7 +124,7 @@ tr:hover td{background:#f8fafc;cursor:pointer}
 
 <div class="header">
   <div class="logo">&#128200; <span>Marco</span> Trading Hub</div>
-  <div class="badge">v1.2</div>
+  <div class="badge">v1.3</div>
   <div class="hdr-right">
     <div class="acct-label">Account:</div>
     <select class="acct-select" id="acctSelect" onchange="onAcctChange()"><option value="">Loading&#8230;</option></select>
@@ -260,11 +260,13 @@ function renderTabBar(){
 }
 function switchTab(t){tab=t;killCharts();renderTabBar();renderContent();}
 
+// FIX v1.3: Use local date parts instead of toISOString() to avoid UTC offset shifting dates
+function f(dt){var yy=dt.getFullYear();var mm=String(dt.getMonth()+1).padStart(2,'0');var dd=String(dt.getDate()).padStart(2,'0');return yy+'-'+mm+'-'+dd;}
+
 function setPreset(p,btn){
   document.querySelectorAll('.preset').forEach(function(b){b.classList.remove('active');});
   if(btn)btn.classList.add('active');
   var now=new Date(),y=now.getFullYear(),m=now.getMonth(),d=now.getDate();
-  var f=function(dt){return dt.toISOString().slice(0,10);};
   dateFrom='';dateTo='';
   if(p==='today'){dateFrom=dateTo=f(now);}
   else if(p==='week'){var w=new Date(now);w.setDate(d-((now.getDay()+6)%7));dateFrom=f(w);dateTo=f(now);}
@@ -342,7 +344,7 @@ function updateStrip(){
   var pnl=closed.reduce(function(s,t){return s+parseFloat(t.pnl||0);},0);
   var wRate=closed.length?closed.filter(function(t){return parseFloat(t.pnl||0)>0;}).length/closed.length*100:0;
   var openPos=raw.positions.length;
-  var today=new Date().toISOString().slice(0,10);
+  var today=f(new Date());
   var todayPnl=closed.filter(function(t){return t.ts&&t.ts.slice(0,10)===today;}).reduce(function(s,t){return s+parseFloat(t.pnl||0);},0);
   var bestName='—',bestVal=-Infinity;
   allAccts.forEach(function(a){var ap=totalPnl(acctData[a.id]||[]);if(ap>bestVal){bestVal=ap;bestName=a.label||a.broker||a.id.slice(0,8);}});
@@ -434,7 +436,7 @@ function rAccounts(){
       +'<div class="acct-kpi"><div class="acct-kpi-label">Win Rate</div><div class="acct-kpi-val" style="color:var(--gold)">'+wRate.toFixed(1)+'%</div></div>'
       +'<div class="acct-kpi"><div class="acct-kpi-label">Trades</div><div class="acct-kpi-val">'+d.length+'</div></div>'
       +'<div class="acct-kpi"><div class="acct-kpi-label">Avg Trade</div><div class="acct-kpi-val '+(avgT>=0?'pnl-pos':'pnl-neg')+'">'+(avgT>=0?'+':'')+fp(avgT)+'</div></div>'
-      +'<div class="acct-kpi"><div class="acct-kpi-label">Open</div><div class="acct-kpi-val '+(openPos>0?'pnl-pos':'')+'">'+( openPos||'—')+'</div></div>'
+      +'<div class="acct-kpi"><div class="acct-kpi-label">Open</div><div class="acct-kpi-val '+(openPos>0?'pnl-pos':'')+'">'+(openPos||'—')+'</div></div>'
       +'<div class="acct-kpi"><div class="acct-kpi-label">Currency</div><div class="acct-kpi-val">'+(a.currency||'USD')+'</div></div>'
       +'</div><div class="acct-sparkline"><canvas id="spark_'+ai+'"></canvas></div></div>';
   }).join('')+'</div>';
